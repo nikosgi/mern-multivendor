@@ -18,6 +18,8 @@ const port  = process.env.PORT || 8080;
 // Configuration
 // ================================================================================================
 
+
+
 // Set up Mongoose
 mongoose.connection.on('error', function(err){
   console.log('Mongoose default connection error: '+ err);
@@ -26,7 +28,7 @@ mongoose.connection.on('connected', function(){
   console.log('Mongoose default connection open to ');
 });
 
-
+console.log(config);
 mongoose.connect(config.db, {
   useMongoClient: true,
 });
@@ -64,6 +66,7 @@ if (isDev) {
   app.use(express.static(path.resolve(__dirname, '../dist')));
 } else {
   app.use(express.static(path.resolve(__dirname, '../dist')));
+
   app.get('*', function (req, res) {
     res.sendFile(path.resolve(__dirname, '../dist/index.html'));
     res.end();
