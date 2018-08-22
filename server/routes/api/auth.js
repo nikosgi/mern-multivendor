@@ -21,11 +21,11 @@ module.exports = (app) =>{
     		console.log(user);
     	// save the user
 	    	user.save(function(err) {
-      		if (err) {
-		        return res.json({success: false, msg: 'Username already exists.'});
-      		}
-      		console.log("success");
-      		res.json({success: true, msg: 'Successful created new user.'});
+      			if (err) {
+		        	return res.json({success: false, msg: 'Username already exists.'});
+      			}
+      			console.log("success");
+      			res.json({success: true, msg: 'Successful created new user.'});
     		});
   		}
 	});
