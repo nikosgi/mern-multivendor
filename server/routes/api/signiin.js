@@ -8,46 +8,31 @@ module.exports = (app) => {
    */
   app.post('/api/account/signup', (req, res, next) => {
     const { body } = req;
-    const {
-      password
-    } = body;
-    let {
-      email
-    } = body;
+    const { password } = body;
+    let { email } = body;
 
-    if (!email) {
-      return res.send({
-        success: false,
-        message: 'Error: Email cannot be blank.'
-      });
-    }
-    if (!password) {
-      return res.send({
-        success: false,
-        message: 'Error: Password cannot be blank.'
-      });
-    }
+    req.checkBody('email', 'Email is required').notEmpty();
+    req.checkBody('email', 'Enter a valid email').isEmail();
+    req.checkBody('password', 'Password is required').notEmpty();
+
+    const errors = req.validationErrors();
+
+    if (errors){
+      req.session.errors=errors;
+      return res.send({ success: false, message: errors[0].msg});
+    };
 
     email = email.toLowerCase();
     email = email.trim();
-
     // Steps:
     // 1. Verify email doesn't exist
     // 2. Save
-    User.find({
-      email: email
-    }, (err, previousUsers) => {
-      if (err) {
-        return res.send({
-          success: false,
-          message: 'Error: Server error'
-        });
-      } else if (previousUsers.length > 0) {
-        return res.send({
-          success: false,
-          message: 'Error: Account already exist.'
-        });
-      }
+    User.find({ email: email}, (err, previousUsers) => {
+
+      if (err)
+        return res.send({ success: false, message: 'Error: Server error'});
+      else if (previousUsers.length > 0)
+        return res.send({ success: false, message: 'Error: Account already exist.'});
 
       // Save the new user
       const newUser = new User();
@@ -55,16 +40,10 @@ module.exports = (app) => {
       newUser.email = email;
       newUser.password = newUser.generateHash(password);
       newUser.save((err, user) => {
-        if (err) {
-          return res.send({
-            success: false,
-            message: 'Error: Server error'
-          });
-        }
-        return res.send({
-          success: true,
-          message: 'Signed up'
-        });
+        if (err)
+          return res.send({ success: false, message: 'Error: Server error'});
+        req.session.success= true;
+        return res.send({ success: true, message: 'Signed up'});
       });
     });
 
@@ -72,56 +51,38 @@ module.exports = (app) => {
 
   app.post('/api/account/signin', (req, res, next) => {
     const { body } = req;
-    const {
-      password
-    } = body;
-    let {
-      email
-    } = body;
+    const { password } = body;
+    let { email } = body;
 
+    req.checkBody('email', 'Email is required').notEmpty();
+    req.checkBody('email', 'Enter a valid email').isEmail();
+    req.checkBody('password', 'Password is required').notEmpty();
 
-    if (!email) {
-      return res.send({
-        success: false,
-        message: 'Error: Email cannot be blank.'
-      });
-    }
-    if (!password) {
-      return res.send({
-        success: false,
-        message: 'Error: Password cannot be blank.'
-      });
-    }
+    const errors = req.validationErrors();
+
+    if (errors){
+      req.session.errors=errors;
+      return res.send({ success: false, message: errors[0].msg});
+    };
 
     email = email.toLowerCase();
     email = email.trim();
 
-    User.find({
-      email: email
-    }, (err, users) => {
-      if (err) {
-        console.log('err 2:', err);
-        return res.send({
-          success: false,
-          message: 'Error: server error'
-        });
-      }
-      if (users.length != 1) {
-        return res.send({
-          success: false,
-          message: 'Error: Invalid'
-        });
-      }
+
+    User.find({email: email}, (err, users) => {
+      if (err)
+        return res.send({success: false, message: 'Error:' + err});
+      if (users.length != 1)
+        return res.send({success: false, message: 'Error: Invalid'});
 
       const user = users[0];
-      if (!user.validPassword(password)) {
-        return res.send({
-          success: false,
-          message: 'Error: Invalid'
-        });
-      }
+      if (!user.validPassword(password))
+        return res.send({success: false, message: 'Error: Invalid'});
 
       // Otherwise correct user
+
+      req.session.userId = user._id;
+
       const userSession = new UserSession();
       userSession.userId = user._id;
       userSession.save((err, doc) => {

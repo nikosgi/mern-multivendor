@@ -8,19 +8,17 @@ const webpack = require('webpack');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
 
+const cookieParser =  require('cookie-parser');
+const expressValidator = require('express-validator');
+const session = require('express-session');
+
 const config = require('../config/config');
 const webpackConfig = require('../webpack.config');
 
 const isDev = process.env.NODE_ENV !== 'production';
 const port  = process.env.PORT || 8080;
 
-
-// Configuration
-// ================================================================================================
-
-
-
-// Set up Mongoose
+//-------------- Database Mongoose ------------------
 mongoose.connection.on('error', function(err){
   console.log('Mongoose default connection error: '+ err);
 });
@@ -29,6 +27,7 @@ mongoose.connection.on('connected', function(){
 });
 
 console.log(config);
+
 mongoose.connect(config.db, {
   useMongoClient: true,
 });
@@ -37,6 +36,9 @@ mongoose.Promise = global.Promise;
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(cookieParser());
+app.use(session({secret: '4nsecret!%%', resave: false, saveUninitialized: true,}));
+app.use(expressValidator());
 
 // API routes
 require('./routes')(app);
@@ -68,6 +70,7 @@ if (isDev) {
   app.use(express.static(path.resolve(__dirname, '../dist')));
 
   app.get('*', function (req, res) {
+    console.log(req.session);
     res.sendFile(path.resolve(__dirname, '../dist/index.html'));
     res.end();
   });
