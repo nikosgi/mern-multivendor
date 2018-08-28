@@ -76,43 +76,35 @@ module.exports = (app) => {
         return res.send({success: false, message: 'Error: Invalid'});
 
       const user = users[0];
-      if (!user.validPassword(password))
-        return res.send({success: false, message: 'Error: Invalid'});
 
-      // Otherwise correct user
-
-      req.session.userId = user._id;
-
-      const userSession = new UserSession();
-      userSession.userId = user._id;
-      userSession.save((err, doc) => {
-        if (err) {
-          console.log(err);
-          return res.send({
-            success: false,
-            message: 'Error: server error'
-          });
-        }
-
-        return res.send({
-          success: true,
-          message: 'Valid sign in',
-          token: doc._id
-        });
+      user.comparePassword(password, function (err, matched) {
+          if (matched && !err) {
+            req.session.sid = user._id;
+            const userSession = new UserSession();
+            userSession.userId = user._id;
+            userSession.save((err, doc) => {
+              if (err)
+                return res.send({ success: false, message: 'Error: server error'});
+              return res.send({ success: true, message: 'Valid sign in', token: doc._id });
+            });
+          } else {
+            res.status(401).send({success: false, message: 'Authentication failed. Wrong password.'});
+          }
       });
     });
   });
 
   app.get('/api/account/verify', (req, res, next) => {
     // Get the token
-    const { query } = req;
-    const { token } = query;
-    // ?token=test
+    const {sid} = req.session
+
+    console.log(req.session, ' Session');
+    console.log(sid);
 
     // Verify the token is one of a kind and it's not deleted.
-
+    console.log('i am verify');
     UserSession.find({
-      _id: token,
+      userId: sid,
       isDeleted: false
     }, (err, sessions) => {
       if (err) {
@@ -122,7 +114,7 @@ module.exports = (app) => {
           message: 'Error: Server error'
         });
       }
-
+      console.log('these are the sessions baby: ', sessions)
       if (sessions.length != 1) {
         return res.send({
           success: false,
