@@ -1,5 +1,5 @@
-const User = require('../../models/User');
-const UserSession = require('../../models/UserSession');
+const User = require('../../models/account/User');
+const Session = require('../../models/account/Session');
 
 
 module.exports = (app) => {
@@ -69,7 +69,7 @@ module.exports = (app) => {
     email = email.trim();
 
 
-    User.find({email: email}, (err, users) => {
+    User.find({email: email},{runValidators: true}, (err, users) => {
       if (err)
         return res.send({success: false, message: 'Error:' + err});
       if (users.length != 1)
@@ -80,7 +80,7 @@ module.exports = (app) => {
       user.comparePassword(password, function (err, matched) {
           if (matched && !err) {
             req.session.sid = user._id;
-            const userSession = new UserSession();
+            const userSession = new Session();
             userSession.userId = user._id;
             userSession.save((err, doc) => {
               if (err)
@@ -97,13 +97,9 @@ module.exports = (app) => {
   app.get('/api/account/verify', (req, res, next) => {
     // Get the token
     const {sid} = req.session
-
-    console.log(req.session, ' Session');
-    console.log(sid);
-
     // Verify the token is one of a kind and it's not deleted.
-    console.log('i am verify');
-    UserSession.find({
+
+    Session.find({
       userId: sid,
       isDeleted: false
     }, (err, sessions) => {
@@ -131,14 +127,13 @@ module.exports = (app) => {
 
   app.get('/api/account/logout', (req, res, next) => {
     // Get the token
-    const { query } = req;
-    const { token } = query;
+    const {sid} = req.session
     // ?token=test
 
     // Verify the token is one of a kind and it's not deleted.
 
-    UserSession.findOneAndUpdate({
-      _id: token,
+    Session.findOneAndUpdate({
+      userId: sid,
       isDeleted: false
     }, {
       $set: {
@@ -159,4 +154,8 @@ module.exports = (app) => {
       });
     });
   });
+
+
+
+
 };

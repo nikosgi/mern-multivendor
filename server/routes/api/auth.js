@@ -4,7 +4,7 @@ var settings = require('../../../config/auth/settings');
 require('../../../config/auth/passport')(passport);
 
 var jwt = require('jsonwebtoken');
-var User = require("../../models/User");
+var User = require("../../models/account/User");
 
 
 module.exports = (app) =>{
