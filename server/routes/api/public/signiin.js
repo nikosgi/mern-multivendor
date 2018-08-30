@@ -1,5 +1,5 @@
-const User = require('../../models/account/User');
-const Session = require('../../models/account/Session');
+const User = require('../../../models/account/User');
+const Session = require('../../../models/account/Session');
 
 
 module.exports = (app) => {
@@ -27,6 +27,7 @@ module.exports = (app) => {
     // Steps:
     // 1. Verify email doesn't exist
     // 2. Save
+    console.log(email);
     User.find({ email: email}, (err, previousUsers) => {
 
       if (err)
@@ -35,11 +36,13 @@ module.exports = (app) => {
         return res.send({ success: false, message: 'Error: Account already exist.'});
 
       // Save the new user
-      const newUser = new User();
+      const user = new User();
 
-      newUser.email = email;
-      newUser.password = newUser.generateHash(password);
-      newUser.save((err, user) => {
+      user.email = email;
+      user.password = password;
+      user.verified = false;
+      user.roles = ['buyer'];
+      user.save((err, user) => {
         if (err)
           return res.send({ success: false, message: 'Error: Server error'});
         req.session.success= true;
@@ -69,14 +72,14 @@ module.exports = (app) => {
     email = email.trim();
 
 
-    User.find({email: email},{runValidators: true}, (err, users) => {
+    User.find({email: email}, (err, users) => {
       if (err)
         return res.send({success: false, message: 'Error:' + err});
       if (users.length != 1)
         return res.send({success: false, message: 'Error: Invalid'});
 
       const user = users[0];
-
+      console.log(user, 'user @ signin');
       user.comparePassword(password, function (err, matched) {
           if (matched && !err) {
             req.session.sid = user._id;

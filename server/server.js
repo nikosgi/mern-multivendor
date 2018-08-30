@@ -7,7 +7,6 @@ const path = require('path');
 const webpack = require('webpack');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
-
 const cookieParser =  require('cookie-parser');
 const expressValidator = require('express-validator');
 const session = require('express-session');
@@ -17,6 +16,8 @@ const webpackConfig = require('../webpack.config');
 
 const isDev = process.env.NODE_ENV !== 'production';
 const port  = process.env.PORT || 8080;
+
+const authenticate= require("./middlewares/authentication");
 
 //-------------- Database Mongoose ------------------
 mongoose.connection.on('error', function(err){
@@ -39,7 +40,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(session({secret: '4nsecret!%%', resave: false, saveUninitialized: true,}));
 app.use(expressValidator());
-
+app.use('/api/supplier/',authenticate)
 // API routes
 require('./routes')(app);
 

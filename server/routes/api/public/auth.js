@@ -1,10 +1,10 @@
 var passport = require('passport');
 var CryptoJS = require('crypto-js');
-var settings = require('../../../config/auth/settings');
-require('../../../config/auth/passport')(passport);
+var settings = require('../../../../config/auth/settings');
+require('../../../../config/auth/passport')(passport);
 
-var jwt = require('jsonwebtoken');
-var User = require("../../models/account/User");
+// var jwt = require('jsonwebtoken');
+var User = require("../../../models/account/User");
 
 
 module.exports = (app) =>{
