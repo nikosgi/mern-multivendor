@@ -37,11 +37,12 @@ module.exports = (app) => {
 
       // Save the new user
       const user = new User();
-
+      const userRoles = ["buyer"];
       user.email = email;
       user.password = password;
       user.verified = false;
-      user.roles = ['buyer'];
+      user.roles = userRoles;
+      console.log(user,user.roles, "@SIGNUYP");
       user.save((err, user) => {
         if (err)
           return res.send({ success: false, message: 'Error: Server error'});
@@ -82,14 +83,15 @@ module.exports = (app) => {
       console.log(user, 'user @ signin');
       user.comparePassword(password, function (err, matched) {
           if (matched && !err) {
-            req.session.sid = user._id;
-            const userSession = new Session();
-            userSession.userId = user._id;
-            userSession.save((err, doc) => {
-              if (err)
-                return res.send({ success: false, message: 'Error: server error'});
-              return res.send({ success: true, message: 'Valid sign in', token: doc._id });
-            });
+            req.session.userID = user._id;
+            // const userSession = new Session();
+            // userSession._id = req.sessionID;
+            // userSession.userId = user._id;
+            // userSession.save((err, doc) => {
+            //   if (err)
+            //     return res.send({ success: false, message: 'Error: server error' + err});
+              return res.send({ success: true, message: 'Valid sign i'});
+            // });
           } else {
             res.status(401).send({success: false, message: 'Authentication failed. Wrong password.'});
           }
@@ -99,33 +101,15 @@ module.exports = (app) => {
 
   app.get('/api/account/verify', (req, res, next) => {
     // Get the token
-    const {sid} = req.session
-    // Verify the token is one of a kind and it's not deleted.
 
-    Session.find({
-      userId: sid,
-      isDeleted: false
-    }, (err, sessions) => {
-      if (err) {
-        console.log(err);
-        return res.send({
-          success: false,
-          message: 'Error: Server error'
-        });
-      }
-      console.log('these are the sessions baby: ', sessions)
-      if (sessions.length != 1) {
-        return res.send({
-          success: false,
-          message: 'Error: Invalid'
-        });
-      } else {
-        return res.send({
-          success: true,
-          message: 'Good'
-        });
-      }
-    });
+    const {userID} = req.session;
+    // Verify the token is one of a kind and it's not deleted.
+    console.log(req.session);
+    if (userID)
+        return res.send({ success: true, message: 'Good'});
+    else
+        return res.send({ success: false, message: 'Error: Invalid'});
+
   });
 
   app.get('/api/account/logout', (req, res, next) => {

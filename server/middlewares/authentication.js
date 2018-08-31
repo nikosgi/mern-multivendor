@@ -1,27 +1,20 @@
 // middleware for authentication
-module.exports = function authenticate(req, res, next) {
-  const {sid} = req.session;
-  console.log("@AUTHNETICATIN",req.session,sid);
-  if (!sid)
+var User = require("../models/account/User");
+
+module.exports = async function authenticate(req, res, next) {
+  const {userID} = req.session;
+  console.log("AUth middleware");
+  if (!userID)
     res.locals.user = null;
   else
-    Session.find({ userId: sid, isDeleted: false}, (err, sessions) => {
+    await User.find({_id: userID}, (err, users) => {
       if (err)
-        res.locals.error = err;
-      if (sessions.length != 1){
-        res.locals.error = { success: false, message: 'Multiple active sessions found'};
-      }else{
-        User.find({_id: sid}, (err, users) => {
-          if (err)
-            return res.send({success: false, message: 'Error:' + err});
-          if (users.length != 1)
-            return res.send({success: false, message: 'Error: Invalid'});
-          const user = users[0];
-          res.locals.user = user;
-          console.log('@AUTH/ ',res.locals);
-        });
-      }
+        return res.send({success: false, message: 'Error:' + err});
+      if (users.length != 1)
+        return res.send({success: false, message: 'Error: Invalid'});
+      const user = users[0];
+      res.locals.user = user;
+      console.log('@AUTH/ ',res.locals);
     });
   next();
-
 }

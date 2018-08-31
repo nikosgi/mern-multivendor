@@ -2,9 +2,9 @@ const Product = require('../../../models/Product');
 // const Session = require('../../models/account/Session');
 
 
-module.exports = (app) => {
+module.exports = (app) => (auth) => {
 
-  app.get('/api/supplier/products', (req, res, next) => {
+  app.get('/api/supplier/products', auth, (req, res, next) => {
     // Get the token
     const {sid} = req.session
     // Verify the token is one of a kind and it's not deleted.
@@ -35,7 +35,8 @@ module.exports = (app) => {
     });
   });
 
-  app.post('/api/supplier/products', (req, res, next) => {
+  app.post('/api/supplier/products', auth, (req, res, next) => {
+    console.log("@PRODUCTS API", req.session, req.sessionID)
     console.log('MIDDLEWARE WORKed?', res.locals)
     const { title, price } = req.body;
 
@@ -61,7 +62,7 @@ module.exports = (app) => {
     });
   });
 
-  app.delete('/api/supplier/products', (req, res, next) => {
+  app.delete('/api/supplier/products', auth,  (req, res, next) => {
     const { body } = req;
     const { password } = body;
     let { email } = body;
@@ -107,7 +108,7 @@ module.exports = (app) => {
   });
 
 
-  app.put('/api/supplier/products', (req, res, next) => {
+  app.put('/api/supplier/products',auth, (req, res, next) => {
     // Get the token
     const {sid} = req.session
     // ?token=test

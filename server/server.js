@@ -10,6 +10,7 @@ const webpackHotMiddleware = require('webpack-hot-middleware');
 const cookieParser =  require('cookie-parser');
 const expressValidator = require('express-validator');
 const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
 
 const config = require('../config/config');
 const webpackConfig = require('../webpack.config');
@@ -18,6 +19,7 @@ const isDev = process.env.NODE_ENV !== 'production';
 const port  = process.env.PORT || 8080;
 
 const authenticate= require("./middlewares/authentication");
+const authorize= require("./middlewares/authorization");
 
 //-------------- Database Mongoose ------------------
 mongoose.connection.on('error', function(err){
@@ -33,16 +35,27 @@ mongoose.connect(config.db, {
   useMongoClient: true,
 });
 mongoose.Promise = global.Promise;
-
+const db = mongoose.connection;
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
-app.use(session({secret: '4nsecret!%%', resave: false, saveUninitialized: true,}));
+app.use(session(
+  {
+    secret: '4nsecret!%%',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      httpOnly: true,
+      // secure: true,
+      maxAge: 10 * 60 * 1000 // 10 minutes
+    },
+    store: new MongoStore({ mongooseConnection: db })
+  }
+));
 app.use(expressValidator());
-app.use('/api/supplier/',authenticate)
-// API routes
-require('./routes')(app);
+
+
 
 if (isDev) {
   console.log("isDev");
@@ -76,6 +89,12 @@ if (isDev) {
     res.end();
   });
 }
+
+app.use('/api/supplier',authenticate);
+// app.use('/api/supplier/',authorize('buyer'));
+// app.use('/api/buyer/',authorize('buyer'));
+// API routes
+require('./routes')(app);
 
 app.listen(port, 'localhost', (err) => {
   if (err) {
