@@ -1,12 +1,36 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt-nodejs');
 
-const UserSchema = new mongoose.Schema({
-	email: String,
-	password: String,
-	verified: Boolean,
-	roles: [{type: String}],
-	profile: mongoose.Schema.Types.ObjectID, 
+const StoreSchema = new mongoose.Schema({
+  balance: {
+
+  },
+  orders: {
+
+  },
+  reviews: {
+
+  },
+  comments: {
+
+  },
+  products: {
+
+  },
+	email: {
+		type: String,
+		unique: true,
+		required: true,
+		trim: true,
+	},
+	password: {
+		type: String,
+		required: true,
+	},
+	verified: {
+		type: Boolean,
+		required: true,
+	}
 });
 
 UserSchema.pre('save',function(next){
@@ -34,23 +58,7 @@ UserSchema.pre('save',function(next){
 	}
 });
 
-UserSchema.methods.comparePassword = function (passw, cb) {
-    bcrypt.compare(passw, this.password, function (err, res) {
-        if (err) {
-            return cb(err);
-        }
-        cb(null, res);
-    });
-};
-
-UserSchema.methods.validPassword = function (pass){
-		bcrypt.compare(pass, this.password, function(err, res){
-			if (err)
-				return err
-			else
-				return res
-		})
-}
 
 
-module.exports = mongoose.model('User', UserSchema);
+
+module.exports = mongoose.model('User', StoreSchema);

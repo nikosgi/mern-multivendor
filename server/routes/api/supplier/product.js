@@ -2,7 +2,7 @@ const Product = require('../../../models/Product');
 // const Session = require('../../models/account/Session');
 
 
-module.exports = (app) => (auth) => {
+module.exports = (app) => (auth) => (client) => {
 
   app.get('/api/supplier/products', auth, (req, res, next) => {
     // Get the token
@@ -36,13 +36,11 @@ module.exports = (app) => (auth) => {
   });
 
   app.post('/api/supplier/products', auth, (req, res, next) => {
-    console.log("@PRODUCTS API", req.session, req.sessionID)
-    console.log('MIDDLEWARE WORKed?', res.locals)
-    const { title, price } = req.body;
+    const { title, price, description } = req.body;
 
     req.checkBody('title', 'Title is required').notEmpty();
     req.checkBody('price', 'Price is required').notEmpty();
-
+    req.checkBody('description', 'Decsription is required').notEmpty();
     const errors = req.validationErrors();
 
     if (errors){
@@ -60,6 +58,18 @@ module.exports = (app) => (auth) => {
       req.session.success= true;
       return res.send({ success: true, message: 'Product saved'});
     });
+
+    client.index({
+      index: 'products',
+      type: 'product',
+      body: {
+        "productTitle": product.title,
+        "productDescription": product.description,
+      }
+    }, function(err, resp, status) {
+      console.log(resp);
+    });
+
   });
 
   app.delete('/api/supplier/products', auth,  (req, res, next) => {

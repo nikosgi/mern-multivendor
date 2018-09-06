@@ -14,7 +14,7 @@ module.exports = async function authenticate(req, res, next) {
         return res.send({success: false, message: 'Error: Invalid'});
       const user = users[0];
       res.locals.user = user;
-      console.log('@AUTH/ ',res.locals);
+      // console.log('@AUTH/ ',res.locals);
     });
   next();
 }

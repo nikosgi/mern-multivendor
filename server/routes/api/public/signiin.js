@@ -2,7 +2,7 @@ const User = require('../../../models/account/User');
 const Session = require('../../../models/account/Session');
 
 
-module.exports = (app) => {
+module.exports = (app) => (client) => {
   /*
    * Sign up
    */

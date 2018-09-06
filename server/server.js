@@ -3,6 +3,7 @@ const express = require('express');
 const fs = require('fs');
 const historyApiFallback = require('connect-history-api-fallback');
 const mongoose = require('mongoose');
+const elasticsearch = require('elasticsearch');
 const path = require('path');
 const webpack = require('webpack');
 const webpackDevMiddleware = require('webpack-dev-middleware');
@@ -11,15 +12,13 @@ const cookieParser =  require('cookie-parser');
 const expressValidator = require('express-validator');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
-
+const client = require('../config/elasticsearch');
 const config = require('../config/config');
 const webpackConfig = require('../webpack.config');
 
 const isDev = process.env.NODE_ENV !== 'production';
 const port  = process.env.PORT || 8080;
 
-const authenticate= require("./middlewares/authentication");
-const authorize= require("./middlewares/authorization");
 
 //-------------- Database Mongoose ------------------
 mongoose.connection.on('error', function(err){
@@ -30,6 +29,10 @@ mongoose.connection.on('connected', function(){
 });
 
 console.log(config);
+
+
+
+
 
 mongoose.connect(config.db, {
   useMongoClient: true,
@@ -90,9 +93,6 @@ if (isDev) {
   });
 }
 
-app.use('/api/supplier',authenticate);
-// app.use('/api/supplier/',authorize('buyer'));
-// app.use('/api/buyer/',authorize('buyer'));
 // API routes
 require('./routes')(app);
 

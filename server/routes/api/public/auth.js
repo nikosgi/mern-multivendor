@@ -7,7 +7,7 @@ require('../../../../config/auth/passport')(passport);
 var User = require("../../../models/account/User");
 
 
-module.exports = (app) =>{
+module.exports = (app) => (client) =>{
 
    app.post('/api/register', function(req, res) {
      console.log('headers: =>: ',req.headers);

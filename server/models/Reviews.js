@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-
 const Profile = require('./account/Profile');
 
 const ProductSchema = new mongoose.Schema({
@@ -13,7 +12,6 @@ const ProductSchema = new mongoose.Schema({
       user: mongoose.Schema.Types.ObjectID,
   }]
 });
-
 
 
 
