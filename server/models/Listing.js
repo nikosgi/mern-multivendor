@@ -5,6 +5,7 @@ const Profile = require('./account/Profile');
 const Product = require('./Product');
 
 const ListingSchema = new mongoose.Schema({
+
   type: String,
   created: Date,
   started: Date,
@@ -28,4 +29,4 @@ const ListingSchema = new mongoose.Schema({
 
 
 
-module.exports = mongoose.model('Product', ListingSchema);
+module.exports = mongoose.model('Listing', ListingSchema);

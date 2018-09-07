@@ -19,4 +19,7 @@ module.exports = (app) => {
   fs.readdirSync(__dirname + '/api/supplier/').forEach((file) => {
     require(`./api/supplier/${file.substr(0, file.indexOf('.'))}`)(app)(authenticate,authorize('seller'))(client);
   });
+  fs.readdirSync(__dirname + '/api/user/').forEach((file) => {
+    require(`./api/user/${file.substr(0, file.indexOf('.'))}`)(app)(authenticate,authorize(['buyer','seller']))(client);
+  });
 };

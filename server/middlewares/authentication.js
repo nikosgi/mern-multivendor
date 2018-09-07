@@ -3,7 +3,7 @@ var User = require("../models/account/User");
 
 module.exports = async function authenticate(req, res, next) {
   const {userID} = req.session;
-  console.log("AUth middleware");
+  console.log("AUth middleware", userID);
   if (!userID)
     res.locals.user = null;
   else

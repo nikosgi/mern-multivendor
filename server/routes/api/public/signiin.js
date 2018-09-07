@@ -1,5 +1,5 @@
 const User = require('../../../models/account/User');
-const Session = require('../../../models/account/Session');
+
 
 
 module.exports = (app) => (client) => {
@@ -100,16 +100,17 @@ module.exports = (app) => (client) => {
   });
 
   app.get('/api/account/verify', (req, res, next) => {
+    // res.send({ success: true, message: 'Good'});
     // Get the token
-
+    console.log(req.query);
     const {userID} = req.session;
     // Verify the token is one of a kind and it's not deleted.
     console.log(req.session);
-    if (userID)
-        return res.send({ success: true, message: 'Good'});
-    else
-        return res.send({ success: false, message: 'Error: Invalid'});
-
+    if (userID){
+        res.send({ success: true, message: 'Good'});
+    }else{
+        res.send({ success: false, message: 'Error: Invalid'});
+    }
   });
 
   app.get('/api/account/logout', (req, res, next) => {

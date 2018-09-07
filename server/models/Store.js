@@ -5,10 +5,7 @@ const StoreSchema = new mongoose.Schema({
   name: String,
   opened: Date,
 
-  balance: mongoose.Schema.Types.Decimal128,
-  sales: [{
-    type: mongoose.Schema.Types.OblectId,
-  }],
+
   reviews: [{
     type: mongoose.Schema.Types.OblectId,
   }],

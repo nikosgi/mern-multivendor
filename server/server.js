@@ -3,7 +3,7 @@ const express = require('express');
 const fs = require('fs');
 const historyApiFallback = require('connect-history-api-fallback');
 const mongoose = require('mongoose');
-const elasticsearch = require('elasticsearch');
+
 const path = require('path');
 const webpack = require('webpack');
 const webpackDevMiddleware = require('webpack-dev-middleware');
@@ -58,6 +58,8 @@ app.use(session(
 ));
 app.use(expressValidator());
 
+// API routes
+require('./routes')(app);
 
 
 if (isDev) {
@@ -93,8 +95,7 @@ if (isDev) {
   });
 }
 
-// API routes
-require('./routes')(app);
+
 
 app.listen(port, 'localhost', (err) => {
   if (err) {
