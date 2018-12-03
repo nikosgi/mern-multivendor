@@ -22,11 +22,11 @@ module.exports = (app) => (client) =>{
          }
        }
      }).then(function(resp) {
-       console.log(resp);
+       // console.log(resp);
        res.json(resp);
      }, function(err) {
        res.json(err.message);
-       console.trace(err.message);
+       // console.trace(err.message);
      });
 
 	});

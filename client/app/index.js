@@ -20,7 +20,7 @@ import './styles/styles.scss';
 
 render((
   <Router>
-    <App>
+
       <Switch>
         <Route exact path="/" component={Home}/>
         <Route path="/helloworld" component={HelloWorld}/>
@@ -28,6 +28,6 @@ render((
         <Route path="/register" component={Register}/>
         <Route component={NotFound}/>
       </Switch>
-    </App>
+
   </Router>
 ), document.getElementById('app'));

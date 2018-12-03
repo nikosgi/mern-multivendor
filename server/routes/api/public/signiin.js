@@ -1,6 +1,6 @@
 const User = require('../../../models/account/User');
 
-
+var uniqid = require('uniqid');
 
 module.exports = (app) => (client) => {
   /*
@@ -10,6 +10,7 @@ module.exports = (app) => (client) => {
     const { body } = req;
     const { password } = body;
     let { email } = body;
+
 
     req.checkBody('email', 'Email is required').notEmpty();
     req.checkBody('email', 'Enter a valid email').isEmail();
@@ -31,21 +32,23 @@ module.exports = (app) => (client) => {
     User.find({ email: email}, (err, previousUsers) => {
 
       if (err)
-        return res.send({ success: false, message: 'Error: Server error'});
+        return res.send({ success: false, message: 'Error: Server error' + err});
       else if (previousUsers.length > 0)
         return res.send({ success: false, message: 'Error: Account already exist.'});
 
       // Save the new user
       const user = new User();
-      const userRoles = ["buyer"];
+
+
+      user.username = uniqid();
       user.email = email;
       user.password = password;
       user.verified = false;
-      user.roles = userRoles;
-      console.log(user,user.roles, "@SIGNUYP");
+      user.roles =  ["user","anonymous"];
+
       user.save((err, user) => {
         if (err)
-          return res.send({ success: false, message: 'Error: Server error'});
+          return res.send({ success: false, message: 'Error: Server error' + err});
         req.session.success= true;
         return res.send({ success: true, message: 'Signed up'});
       });
@@ -84,6 +87,7 @@ module.exports = (app) => (client) => {
       user.comparePassword(password, function (err, matched) {
           if (matched && !err) {
             req.session.userID = user._id;
+            req.session.ip = req.connection.remoteAddress;
             // const userSession = new Session();
             // userSession._id = req.sessionID;
             // userSession.userId = user._id;
@@ -107,7 +111,15 @@ module.exports = (app) => (client) => {
     // Verify the token is one of a kind and it's not deleted.
     console.log(req.session);
     if (userID){
-        res.send({ success: true, message: 'Good'});
+      User.find({_id: userID}, (err, users) => {
+        if (err)
+          return res.send({success: false, message: 'Error:' + err});
+        if (users.length != 1)
+          return res.send({success: false, message: 'Error: Invalid'});
+
+        return res.send({success: true, message: 'Valid verify', user: users[0]});
+
+      });
     }else{
         res.send({ success: false, message: 'Error: Invalid'});
     }

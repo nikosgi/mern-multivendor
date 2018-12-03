@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt-nodejs');
 
 const ProfileSchema = new mongoose.Schema({
 
-  isSeller: Boolean,
+  username: String,
 
   balance: mongoose.Schema.Types.Decimal128,
 
@@ -14,23 +14,34 @@ const ProfileSchema = new mongoose.Schema({
     town: String,
   },
 
-  bankAccount: {
+  bankAccount: [{
     name: String,
     holder: String,
     address: String,
-  },
-
-  messages: [{
-    type: mongoose.Schema.Types.ObjectID,
   }],
 
+  reviews: [{
+    // type: mongoose.Schema.Types.OblectID,
+  }],
+  // products: [{
+  //   type: mongoose.Schema.Types.OblectId,
+  //   ref: 'Product',
+  // }],
+  messages: [{
+    // type: mongoose.Schema.Types.ObjectID,
+  }],
   sales: [{
-    type: mongoose.Schema.Types.OblectId,
+    // type: mongoose.Schema.Types.OblectID,
   }],
   orders: [{
-    type: mongoose.Schema.Types.ObjectID,
+    // type: mongoose.Schema.Types.ObjectID,
   }],
-  store: mongoose.Schema.Types.ObjectID,
+
+  store: {
+    name: String,
+    opened: Date,
+    description: String,
+  },
 
 
 });
